@@ -95,6 +95,50 @@ a:hover { text-decoration: underline; }
   gap: 0.75rem;
 }
 
+.menu-toggle { display: none; }
+
+@media (max-width: 700px) {
+  .menu-toggle { display: inline-flex; align-items: center; }
+  .site-header { padding: 0.75rem 1rem; }
+  .site-header .top-actions {
+    position: absolute;
+    right: 1rem;
+    top: calc(100% + 8px);
+    background: var(--bg-elev);
+    border: 1px solid var(--border);
+    box-shadow: var(--shadow);
+    border-radius: 8px;
+    padding: 0.5rem;
+    display: none;
+    flex-direction: column;
+    gap: 0.5rem;
+    min-width: 220px;
+    z-index: 100;
+  }
+  .site-header.menu-open .top-actions { display: flex; }
+  .top-actions .btn { width: 100%; }
+  .brand span {
+    max-width: 50vw;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+}
+
+@media (min-width: 701px) {
+  .menu-toggle { display: none; }
+  .site-header .top-actions {
+    position: static;
+    background: transparent;
+    border: 0;
+    box-shadow: none;
+    padding: 0;
+    display: flex;
+    flex-direction: row;
+    gap: 0.75rem;
+  }
+}
+
 .hero {
   padding: 3rem 2rem;
   text-align: center;
