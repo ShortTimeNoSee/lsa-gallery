@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LSA Gallery — liberty • share • remix</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- PWA -->
+  <link rel="manifest" href="assets/manifest.webmanifest">
+  <meta name="theme-color" content="#0b0f14">
+
+  <!-- Icons -->
+  <link rel="icon" href="assets/logo.svg" type="image/svg+xml">
+
+  <!-- SEO -->
+  <meta name="description" content="A fast, minimalist image gallery licensed under Liberty-ShareAlike 1.0 (LSA-1.0). No attribution required. Share alike.">
+  <meta property="og:title" content="LSA Gallery">
+  <meta property="og:description" content="Images licensed under Liberty-ShareAlike 1.0 (LSA-1.0).">
+  <meta property="og:type" content="website">
+  <meta property="og:image" content="assets/logo.svg">
+  <meta name="robots" content="index,follow">
+
+  <link rel="preload" href="assets/style.css" as="style">
+  <link rel="stylesheet" href="assets/style.css">
+
+  <script>
+    // theme early-switch to avoid FOUC
+    (function(){
+      const t = localStorage.getItem('theme');
+      if (t === 'dark') document.documentElement.dataset.theme = 'dark';
+      else document.documentElement.dataset.theme = 'light';
+    })();
+  </script>
+</head>
+<body>
+  <header class="site-header">
+    <a class="brand" href="./" aria-label="Home">
+      <img src="assets/logo.svg" alt="LSA logo">
+      <span>LSA Gallery</span>
+    </a>
+
+    <nav class="top-actions">
+      <button id="themeToggle" class="btn" aria-label="Toggle theme">Theme</button>
+      <a class="btn outline" href="https://github.com/ShortTimeNoSee/liberty-sharealike/blob/v1.0/LICENSE" target="_blank" rel="noopener">LSA-1.0</a>
+      <a class="btn" href="https://github.com/your-username/lsa-gallery" target="_blank" rel="noopener">GitHub</a>
+    </nav>
+  </header>
+
+  <main>
+    <section class="hero">
+      <h1>liberty • share • remix</h1>
+      <p class="tagline">No gatekeepers. No attribution burden. Share alike.</p>
+      <div class="controls">
+        <input id="search" type="search" placeholder="Search title / tags…" autocomplete="off" spellcheck="false" aria-label="Search images">
+        <select id="sort">
+          <option value="newest">Newest</option>
+          <option value="oldest">Oldest</option>
+          <option value="title">Title</option>
+          <option value="size">File size</option>
+        </select>
+        <button id="layoutToggle" class="btn">Masonry</button>
+      </div>
+    </section>
+
+    <section id="gallery" class="gallery masonry" aria-live="polite">
+      <!-- populated by JS -->
+    </section>
+
+    <template id="cardTemplate">
+      <article class="card" tabindex="0">
+        <div class="thumb-wrap">
+          <img class="thumb" loading="lazy" alt="">
+          <button class="quickview" title="Open" aria-label="Open">Open</button>
+        </div>
+        <div class="meta">
+          <h3 class="title"></h3>
+          <div class="badges">
+            <span class="badge lsa">LSA-1.0</span>
+            <span class="badge size"></span>
+            <span class="badge dims"></span>
+          </div>
+          <div class="tags"></div>
+        </div>
+      </article>
+    </template>
+
+    <dialog id="lightbox" class="lightbox">
+      <div class="lb-header">
+        <h2 id="lbTitle"></h2>
+        <div class="lb-actions">
+          <a id="rawLink" class="btn outline" download>Download</a>
+          <button id="stampBtn" class="btn">Download w/ notice</button>
+          <button id="copyNotice" class="btn">Copy LSA notice</button>
+          <a id="licenseLink" class="btn" target="_blank" rel="noopener">License</a>
+          <button id="closeLb" class="btn">Close</button>
+        </div>
+      </div>
+      <div class="lb-body">
+        <img id="lbImg" alt="">
+        <p id="lbDesc" class="desc"></p>
+        <div id="lbTags" class="tags"></div>
+
+        <!-- SEO/metadata for the open image -->
+        <script type="application/ld+json" id="lbJsonLd"></script>
+      </div>
+    </dialog>
+  </main>
+
+  <footer class="site-footer">
+    <p>
+      Licensed under <a href="https://github.com/ShortTimeNoSee/liberty-sharealike/blob/v1.0/LICENSE" target="_blank" rel="noopener">Liberty-ShareAlike 1.0 (LSA-1.0)</a>.
+      No attribution required. Share alike. <span class="muted">SPDX: LicenseRef-LSA-1.0</span>
+    </p>
+  </footer>
+
+  <script src="assets/app.js" defer></script>
+</body>
+</html>

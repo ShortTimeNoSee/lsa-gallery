@@ -1,0 +1,12 @@
+{
+  "name": "lsa-gallery",
+  "private": true,
+  "version": "1.0.0",
+  "scripts": {
+    "build:manifest": "node scripts/generate-manifest.js",
+    "embed:license": "node scripts/embed-license.js"
+  },
+  "dependencies": {
+    "image-size": "^1.1.1"
+  }
+}
