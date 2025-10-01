@@ -1,0 +1,19 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>LSA Gallery</title>
+  <meta http-equiv="refresh" content="0; url=./?i=%IMAGE_ID%">
+  <script>
+    (function(){
+      var p = location.pathname;
+      var m = p.match(/([^/]+)$/);
+      var id = m ? decodeURIComponent(m[1]) : '';
+      var qs = id ? ('?i=' + encodeURIComponent(id)) : '';
+      location.replace('./' + qs);
+    })();
+  </script>
+</head>
+<body></body>
+</html>
+

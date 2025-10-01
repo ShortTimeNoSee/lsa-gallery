@@ -1,12 +1,13 @@
-const CACHE = 'lsa-gallery-v1';
+const CACHE = 'lsa-gallery-v2';
+const ROOT = new URL('..', self.registration.scope).pathname;
 const ASSETS = [
-  '/', '/index.html',
-  '/assets/style.css',
-  '/assets/app.js',
-  '/assets/logo.svg',
-  '/assets/manifest.webmanifest',
-  '/data/images.json'
-];
+  '', 'index.html',
+  'assets/style.css',
+  'assets/app.js',
+  'assets/logo.svg',
+  'assets/manifest.webmanifest',
+  'data/images.json'
+].map(p => new URL(p, ROOT).pathname);
 
 self.addEventListener('install', (e) => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(ASSETS)));
@@ -21,6 +22,14 @@ self.addEventListener('activate', (e) => {
 
 self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
+
+  if (e.request.mode === 'navigate') {
+    e.respondWith(
+      fetch(e.request).catch(() => caches.match(new URL('index.html', ROOT).pathname))
+    );
+    return;
+  }
+
   // Network first for manifest, cache-first for others
   if (url.pathname.endsWith('/data/images.json')) {
     e.respondWith(

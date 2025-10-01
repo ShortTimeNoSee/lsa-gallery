@@ -1,5 +1,6 @@
 const LICENSE_URL = 'https://github.com/ShortTimeNoSee/liberty-sharealike/blob/v1.0/LICENSE';
 const NOTICE = `Licensed under Liberty-ShareAlike 1.0 (LSA-1.0). Include this license or a stable link if you distribute adaptations. No attribution required. ${LICENSE_URL}`;
+const BASE = getBasePath();
 
 const state = {
   images: [],
@@ -32,7 +33,7 @@ const els = {
 
 async function init() {
   try {
-    const res = await fetch('data/images.json', { cache: 'no-store' });
+    const res = await fetch(BASE + 'data/images.json', { cache: 'no-store' });
     state.images = await res.json();
   } catch (e) {
     console.error('Failed to load manifest', e);
@@ -108,7 +109,7 @@ function render() {
     const size = node.querySelector('.badge.size');
     const tags = node.querySelector('.tags');
 
-    thumb.src = img.src;
+    thumb.src = BASE + img.src;
     thumb.alt = img.alt || img.title || 'image';
     title.textContent = img.title || img.file;
     dims.textContent = `${img.width}×${img.height}`;
@@ -140,10 +141,10 @@ function openLightbox(img, updateUrl = true) {
   
   els.lbTitle.textContent = img.title || img.file;
   els.lbDesc.textContent = img.description || '';
-  els.lbImg.src = img.src;
+  els.lbImg.src = BASE + img.src;
   els.lbImg.alt = img.alt || img.title || 'image';
 
-  els.rawLink.href = img.src;
+  els.rawLink.href = BASE + img.src;
   els.rawLink.download = img.file;
   els.licenseLink.href = LICENSE_URL;
 
@@ -160,8 +161,8 @@ function openLightbox(img, updateUrl = true) {
     "@context": "https://schema.org",
     "@type": "ImageObject",
     "name": img.title || img.file,
-    "contentUrl": location.origin + '/' + img.src,
-    "thumbnail": location.origin + '/' + img.src,
+    "contentUrl": new URL(img.src, location.origin + BASE).toString(),
+    "thumbnail": new URL(img.src, location.origin + BASE).toString(),
     "description": img.description || "",
     "width": img.width,
     "height": img.height,
@@ -171,7 +172,7 @@ function openLightbox(img, updateUrl = true) {
   els.lbJsonLd.textContent = JSON.stringify(jsonLd);
 
   if (updateUrl) {
-    const imageUrl = `/image/${state.currentImageId}`;
+    const imageUrl = BASE + 'image/' + state.currentImageId;
     history.pushState({ imageId: state.currentImageId }, img.title || img.file, imageUrl);
     document.title = `${img.title || img.file} - LSA Gallery`;
   }
@@ -183,7 +184,7 @@ function closeLightbox() {
   els.lb.close();
   state.currentImageId = null;
   
-  history.pushState(null, 'LSA Gallery — liberty • share • remix', '/');
+  history.pushState(null, 'LSA Gallery — liberty • share • remix', BASE);
   document.title = 'LSA Gallery — liberty • share • remix';
 }
 
@@ -251,9 +252,26 @@ function toast(msg) {
 
 async function registerSW() {
   if ('serviceWorker' in navigator) {
-    try { await navigator.serviceWorker.register('assets/sw.js'); }
+    try { await navigator.serviceWorker.register(BASE + 'assets/sw.js'); }
     catch (e) { console.warn('SW failed', e); }
   }
+}
+
+function getBasePath() {
+  try {
+    const script = document.querySelector('script[src$="assets/app.js"]') || document.querySelector('script[src*="/assets/app.js"]');
+    if (script) {
+      const u = new URL(script.src, location.href);
+      let p = u.pathname.replace(/assets\/app\.js$/, '');
+      if (!p.endsWith('/')) p += '/';
+      return p || '/';
+    }
+  } catch (e) {}
+  const parts = location.pathname.split('/').filter(Boolean);
+  if (parts.length > 0) {
+    return '/' + parts[0] + '/';
+  }
+  return '/';
 }
 
 function getImageId(img) {
@@ -270,7 +288,8 @@ function findImageById(imageId) {
 
 function handleInitialRoute() {
   const path = window.location.pathname;
-  const imageMatch = path.match(/^\/image\/(.+)$/);
+  const prefix = (BASE.endsWith('/') ? BASE : BASE + '/').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const imageMatch = path.match(new RegExp('^' + prefix + 'image/(.+)$'));
   
   if (imageMatch) {
     const imageId = imageMatch[1];
@@ -278,15 +297,28 @@ function handleInitialRoute() {
     
     if (img) {
       setTimeout(() => openLightbox(img, false), 100);
+      return;
     } else {
-      history.replaceState(null, 'LSA Gallery — liberty • share • remix', '/');
+      history.replaceState(null, 'LSA Gallery — liberty • share • remix', BASE);
+      return;
+    }
+  }
+  const sp = new URLSearchParams(window.location.search);
+  const qi = sp.get('i') || sp.get('image');
+  if (qi) {
+    const img = findImageById(qi);
+    if (img) {
+      setTimeout(() => openLightbox(img, true), 100);
+    } else {
+      history.replaceState(null, 'LSA Gallery — liberty • share • remix', BASE);
     }
   }
 }
 
 function handlePopState(event) {
   const path = window.location.pathname;
-  const imageMatch = path.match(/^\/image\/(.+)$/);
+  const prefix = (BASE.endsWith('/') ? BASE : BASE + '/').replace(/[-\/\\^$*+?.()|[\]{}]/g, '\\$&');
+  const imageMatch = path.match(new RegExp('^' + prefix + 'image/(.+)$'));
   
   if (imageMatch) {
     const imageId = imageMatch[1];
@@ -295,7 +327,7 @@ function handlePopState(event) {
     if (img && !els.lb.open) {
       openLightbox(img, false);
     } else if (!img) {
-      history.replaceState(null, 'LSA Gallery — liberty • share • remix', '/');
+      history.replaceState(null, 'LSA Gallery — liberty • share • remix', BASE);
     }
   } else {
     if (els.lb.open) {
