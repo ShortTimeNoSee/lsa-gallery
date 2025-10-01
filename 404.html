@@ -3,14 +3,25 @@
 <head>
   <meta charset="utf-8">
   <title>LSA Gallery</title>
-  <meta http-equiv="refresh" content="0; url=./?i=%IMAGE_ID%">
   <script>
     (function(){
       var p = location.pathname;
-      var m = p.match(/([^/]+)$/);
-      var id = m ? decodeURIComponent(m[1]) : '';
-      var qs = id ? ('?i=' + encodeURIComponent(id)) : '';
-      location.replace('./' + qs);
+      var mRepo = p.match(/^\/([^\/]+)\/image\/([^\/?#]+)\/?$/);
+      if (mRepo) {
+        var baseRepo = '/' + mRepo[1] + '/';
+        var idRepo = decodeURIComponent(mRepo[2]);
+        location.replace(baseRepo + '?i=' + encodeURIComponent(idRepo));
+        return;
+      }
+      var mRoot = p.match(/^\/image\/([^\/?#]+)\/?$/);
+      if (mRoot) {
+        var idRoot = decodeURIComponent(mRoot[1]);
+        location.replace('/?i=' + encodeURIComponent(idRoot));
+        return;
+      }
+      var mBase = p.match(/^\/([^\/]+)\//);
+      var base = mBase ? ('/' + mBase[1] + '/') : '/';
+      location.replace(base);
     })();
   </script>
 </head>

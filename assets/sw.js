@@ -1,5 +1,5 @@
-const CACHE = 'lsa-gallery-v2';
-const ROOT = new URL('..', self.registration.scope).pathname;
+const CACHE = 'lsa-gallery-v3';
+const ROOT = new URL('.', self.registration.scope).pathname;
 const ASSETS = [
   '', 'index.html',
   'assets/style.css',
@@ -24,9 +24,15 @@ self.addEventListener('fetch', (e) => {
   const url = new URL(e.request.url);
 
   if (e.request.mode === 'navigate') {
-    e.respondWith(
-      fetch(e.request).catch(() => caches.match(new URL('index.html', ROOT).pathname))
-    );
+    e.respondWith((async () => {
+      try {
+        const res = await fetch(e.request);
+        if (res && res.ok) return res;
+        return await caches.match(new URL('index.html', ROOT).pathname);
+      } catch (_) {
+        return await caches.match(new URL('index.html', ROOT).pathname);
+      }
+    })());
     return;
   }
 
