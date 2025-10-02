@@ -133,6 +133,12 @@ function render() {
     const dims = node.querySelector('.badge.dims');
     const size = node.querySelector('.badge.size');
     const tags = node.querySelector('.tags');
+    if (img.creator) {
+      const creatorBadge = document.createElement('span');
+      creatorBadge.className = 'badge';
+      creatorBadge.textContent = img.creator;
+      node.querySelector('.badges').appendChild(creatorBadge);
+    }
 
     thumb.src = BASE + img.src;
     thumb.alt = img.alt || img.title || 'image';
@@ -166,6 +172,14 @@ function openLightbox(img, updateUrl = true) {
   
   els.lbTitle.textContent = img.title || img.file;
   els.lbDesc.textContent = img.description || '';
+  let creatorEl = document.getElementById('lbCreator');
+  if (!creatorEl) {
+    creatorEl = document.createElement('p');
+    creatorEl.id = 'lbCreator';
+    creatorEl.className = 'desc';
+    els.lbDesc.insertAdjacentElement('afterend', creatorEl);
+  }
+  creatorEl.textContent = img.creator ? `Creator: ${img.creator}` : '';
   els.lbImg.src = BASE + img.src;
   els.lbImg.alt = img.alt || img.title || 'image';
 
@@ -189,6 +203,7 @@ function openLightbox(img, updateUrl = true) {
     "contentUrl": new URL(img.src, location.origin + BASE).toString(),
     "thumbnail": new URL(img.src, location.origin + BASE).toString(),
     "description": img.description || "",
+    "creator": img.creator ? { "@type": "Person", "name": img.creator } : undefined,
     "width": img.width,
     "height": img.height,
     "encodingFormat": img.mime || "",

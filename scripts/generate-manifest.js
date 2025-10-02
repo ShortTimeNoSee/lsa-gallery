@@ -36,6 +36,7 @@ for (const file of files) {
     title: prev.title || titleFromName(file),
     description: prev.description || '',
     alt: prev.alt || '',
+    creator: prev.creator || '',
     width: width || null,
     height: height || null,
     bytes: stat.size,
